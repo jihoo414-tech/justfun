@@ -1,0 +1,11 @@
+{
+  "skillOverrides": {
+    "graphify": "off",
+    "humanizer": "off"
+  },
+  "enabledPlugins": {
+    "ponytail@ponytail": false,
+    "my-harness@my-harness": false,
+    "mattpocock-skills@claude-plugins-official": true
+  }
+}
