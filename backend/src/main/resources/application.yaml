@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: backend
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:minipickle}
+    username: ${POSTGRES_USER:minipickle}
+    password: ${POSTGRES_PASSWORD:minipickle}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
