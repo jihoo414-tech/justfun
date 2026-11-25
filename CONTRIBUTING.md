@@ -38,4 +38,5 @@ PR 병합 전에 다음을 확인한다.
 
 - [AGENTS.md](AGENTS.md)는 에이전트의 공통 작업 지침이다.
 - [GLOSSARY.md](GLOSSARY.md)는 제품 용어의 기준이다.
+- [docs/architecture.md](docs/architecture.md)는 서비스 구성, Spring 모듈과 의존 방향, 애그리거트를 정리한다. [docs/erd.md](docs/erd.md)는 테이블과 컬럼을 정리한다. 테이블이나 모듈 경계를 바꾸는 PR에서 함께 갱신한다.
 - [docs/adr/](docs/adr/)에는 구현에 영향을 주는 설계 결정과 이유를 기록한다. 결정을 바꾸는 PR에서 관련 ADR을 갱신한다.
