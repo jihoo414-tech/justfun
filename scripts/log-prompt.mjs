@@ -1,11 +1,12 @@
 // Prompt-submit hook shared by Claude Code, Codex and Antigravity.
 // Usage: node scripts/log-prompt.mjs <claude|codex|antigravity>  (hook payload on stdin)
-// Appends the human-written prompt to .prompt-log/<tool>/<session>.jsonl.
-// Agent output is not copied; transcript_path points to the full session record.
-// Must never block the prompt, so every failure exits 0.
+// Claude prompts go to .prompt-log/claude/<session>.jsonl with session metadata, so
+// session boundaries and context use can be reviewed later via transcript_path.
+// Codex and Antigravity prompts go to .prompt-log/<tool>.jsonl without session data.
+// Agent output is not copied. Must never block the prompt, so every failure exits 0.
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 const TOOLS = new Set(["claude", "codex", "antigravity"]);
 
@@ -17,24 +18,16 @@ function git(cwd, args) {
   }
 }
 
-// Map each tool's payload to one shape. Antigravity uses camelCase and has no cwd.
-function normalize(tool, input) {
+// Antigravity uses camelCase fields and has no cwd.
+function readPayload(tool, input) {
   if (tool === "antigravity") {
-    return {
-      session_id: input.conversationId,
-      transcript_path: input.transcriptPath ?? null,
-      cwd: input.workspacePaths?.[0] ?? process.cwd(),
-      model: input.modelName ?? null,
-      prompt: input.lastUserInput,
-    };
+    return { cwd: input.workspacePaths?.[0] ?? process.cwd(), prompt: input.lastUserInput };
   }
   return {
-    session_id: input.session_id,
-    turn_id: input.turn_id,
-    transcript_path: input.transcript_path ?? null,
     cwd: input.cwd ?? process.cwd(),
-    model: input.model ?? null,
     prompt: input.prompt,
+    session_id: input.session_id,
+    transcript_path: input.transcript_path ?? null,
   };
 }
 
@@ -52,28 +45,33 @@ try {
   const tool = process.argv[2];
   if (!TOOLS.has(tool)) process.exit(0);
 
-  const event = normalize(tool, JSON.parse(readFileSync(0, "utf8")));
-  if (!event.session_id || typeof event.prompt !== "string") process.exit(0);
+  const { cwd, prompt, session_id, transcript_path } = readPayload(tool, JSON.parse(readFileSync(0, "utf8")));
+  if (typeof prompt !== "string") process.exit(0);
+  if (tool === "claude" && !session_id) process.exit(0);
 
-  const root = process.env.CLAUDE_PROJECT_DIR || git(event.cwd, ["rev-parse", "--show-toplevel"]) || event.cwd;
-  const dir = join(root, ".prompt-log", tool);
-  const file = join(dir, `${String(event.session_id).replace(/[^\w.-]/g, "_")}.jsonl`);
+  const root = process.env.CLAUDE_PROJECT_DIR || git(cwd, ["rev-parse", "--show-toplevel"]) || cwd;
+  const file =
+    tool === "claude"
+      ? join(root, ".prompt-log", "claude", `${String(session_id).replace(/[^\w.-]/g, "_")}.jsonl`)
+      : join(root, ".prompt-log", `${tool}.jsonl`);
 
   // Antigravity's PreInvocation fires on every model call, so skip repeats of the same prompt.
-  if (tool === "antigravity" && lastLoggedPrompt(file) === event.prompt) process.exit(0);
+  if (tool === "antigravity" && lastLoggedPrompt(file) === prompt) process.exit(0);
 
-  mkdirSync(dir, { recursive: true });
-  const entry = {
-    timestamp: new Date().toISOString(),
-    tool,
-    ...event,
-    branch: git(event.cwd, ["rev-parse", "--abbrev-ref", "HEAD"]),
-    commit: git(event.cwd, ["rev-parse", "--short", "HEAD"]),
-  };
+  const entry = { timestamp: new Date().toISOString(), tool };
+  if (tool === "claude") Object.assign(entry, { session_id, transcript_path });
+  Object.assign(entry, {
+    cwd,
+    branch: git(cwd, ["rev-parse", "--abbrev-ref", "HEAD"]),
+    commit: git(cwd, ["rev-parse", "--short", "HEAD"]),
+    prompt,
+  });
+
+  mkdirSync(dirname(file), { recursive: true });
   appendFileSync(file, JSON.stringify(entry) + "\n", "utf8");
 
-  // Claude Code and Codex add stdout to the agent's context, so the agent can cite its session in commits.
-  if (tool !== "antigravity") process.stdout.write(`Prompt log session: ${tool}/${event.session_id}\n`);
+  // Claude Code adds stdout to the agent's context, so the agent can cite its session in commits.
+  if (tool === "claude") process.stdout.write(`Prompt log session: claude/${session_id}\n`);
 } catch {
   // Logging is best-effort.
 }
