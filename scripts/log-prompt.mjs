@@ -1,8 +1,7 @@
 // Prompt-submit hook shared by Claude Code, Codex and Antigravity.
 // Usage: node scripts/log-prompt.mjs <claude|codex|antigravity>  (hook payload on stdin)
-// Claude prompts go to .prompt-log/claude/<session>.jsonl with session metadata, so
-// session boundaries and context use can be reviewed later via transcript_path.
-// Codex and Antigravity prompts go to .prompt-log/<tool>.jsonl without session data.
+// Prompts go to .prompt-log/<tool>/<session>.jsonl.
+// Claude entries include transcript_path for reviewing session context.
 // Agent output is not copied. Must never block the prompt, so every failure exits 0.
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -21,7 +20,11 @@ function git(cwd, args) {
 // Antigravity uses camelCase fields and has no cwd.
 function readPayload(tool, input) {
   if (tool === "antigravity") {
-    return { cwd: input.workspacePaths?.[0] ?? process.cwd(), prompt: input.lastUserInput };
+    return {
+      cwd: input.workspacePaths?.[0] ?? process.cwd(),
+      prompt: input.lastUserInput,
+      session_id: input.conversationId,
+    };
   }
   return {
     cwd: input.cwd ?? process.cwd(),
@@ -46,14 +49,10 @@ try {
   if (!TOOLS.has(tool)) process.exit(0);
 
   const { cwd, prompt, session_id, transcript_path } = readPayload(tool, JSON.parse(readFileSync(0, "utf8")));
-  if (typeof prompt !== "string") process.exit(0);
-  if (tool === "claude" && !session_id) process.exit(0);
+  if (!session_id || typeof prompt !== "string") process.exit(0);
 
   const root = process.env.CLAUDE_PROJECT_DIR || git(cwd, ["rev-parse", "--show-toplevel"]) || cwd;
-  const file =
-    tool === "claude"
-      ? join(root, ".prompt-log", "claude", `${String(session_id).replace(/[^\w.-]/g, "_")}.jsonl`)
-      : join(root, ".prompt-log", `${tool}.jsonl`);
+  const file = join(root, ".prompt-log", tool, `${String(session_id).replace(/[^\w.-]/g, "_")}.jsonl`);
 
   // Antigravity's PreInvocation fires on every model call, so skip repeats of the same prompt.
   if (tool === "antigravity" && lastLoggedPrompt(file) === prompt) process.exit(0);

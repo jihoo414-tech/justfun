@@ -29,7 +29,7 @@ PR 병합 전에 다음을 확인한다.
 
 ## AI 협업
 
-- 사람이 입력한 프롬프트는 훅이 `.prompt-log/`에 저장하며, 이 디렉터리는 git에서 제외한다. Claude Code 프롬프트는 세션별로 `.prompt-log/claude/<세션 ID>.jsonl`에 남기고, 에이전트 출력은 복사하지 않고 각 줄의 `transcript_path`로 찾는다. Codex와 Antigravity 프롬프트는 세션 정보 없이 `.prompt-log/<도구>.jsonl`에 남긴다. Claude Code가 만든 커밋에는 본문 끝에 `Session: claude/<세션 ID>` 트레일러를 붙여 커밋에서 그 세션의 프롬프트 로그를 찾을 수 있게 한다.
+- Claude Code, Codex, Antigravity의 훅은 사람이 입력한 프롬프트를 `.prompt-log/<도구>/<세션 ID>.jsonl`에 저장한다. 이 디렉터리는 git에서 제외한다. Claude Code의 전체 대화 기록은 각 줄의 `transcript_path`에서 찾을 수 있다. Claude Code가 만든 커밋에는 본문 끝에 `Session: claude/<세션 ID>` 트레일러를 붙여 커밋에서 그 세션의 프롬프트 로그를 찾을 수 있게 한다.
 
 - 작업마다 구현 담당을 하나 정한다. Claude Code를 주 구현에 쓰고, Codex에는 중요한 PR의 독립 리뷰나 범위가 분명한 별도 티켓을 맡긴다. Antigravity에는 실행 가능한 화면의 브라우저 검증을 맡긴다.
 - 위임할 때는 이슈, 완료 조건, 작업 범위를 전달한다. 여러 에이전트가 동시에 코드를 수정하면 작업별로 브랜치와 Git 워크트리를 나눈다.
