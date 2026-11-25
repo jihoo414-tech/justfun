@@ -1,3 +1,7 @@
+## Development conventions
+
+Before editing code, working on a branch or PR, delegating a task, or reviewing changes, read [CONTRIBUTING.md](CONTRIBUTING.md) for the applicable workflow, code style, and verification rules.
+
 ## Agent skills
 
 ### Issue tracker
