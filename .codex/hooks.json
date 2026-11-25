@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/log-prompt.mjs\" codex",
+            "commandWindows": "node scripts/log-prompt.mjs codex",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

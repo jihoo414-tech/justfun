@@ -7,5 +7,17 @@
     "ponytail@ponytail": false,
     "my-harness@my-harness": false,
     "mattpocock-skills@claude-plugins-official": true
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/log-prompt.mjs\" claude"
+          }
+        ]
+      }
+    ]
   }
 }
