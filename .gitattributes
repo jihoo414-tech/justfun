@@ -1,0 +1,13 @@
+# 서비스가 Linux 컨테이너에서 돌기 때문에 저장소의 텍스트 파일은 LF로 통일한다.
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.jar binary
