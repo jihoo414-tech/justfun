@@ -1,17 +1,17 @@
-## Development conventions
+## 개발 컨벤션
 
-Before editing code, working on a branch or PR, delegating a task, or reviewing changes, read [CONTRIBUTING.md](CONTRIBUTING.md) for the applicable workflow, code style, and verification rules.
+코드를 수정하거나, 브랜치·PR 작업을 하거나, 작업을 위임하거나, 변경 사항을 리뷰하기 전에 [CONTRIBUTING.md](CONTRIBUTING.md)를 읽고 해당 작업 흐름, 코드 스타일, 검증 규칙을 따른다.
 
-## Agent skills
+## 에이전트 스킬
 
-### Issue tracker
+### 이슈 트래커
 
-Issues live in GitHub Issues for `jihoo414-tech/justfun` (via the `gh` CLI). See `docs/agents/issue-tracker.md`.
+이슈는 `jihoo414-tech/justfun`의 GitHub Issues에서 관리한다(`gh` CLI 사용). `docs/agents/issue-tracker.md`를 참고한다.
 
-### Triage labels
+### 분류 라벨
 
-Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+기본 라벨: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. `docs/agents/triage-labels.md`를 참고한다.
 
-### Domain docs
+### 도메인 문서
 
-Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+단일 컨텍스트 구조로, 저장소 루트에 `GLOSSARY.md` 하나와 `docs/adr/`를 둔다. `docs/agents/domain.md`를 참고한다.

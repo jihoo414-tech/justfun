@@ -1,0 +1,11 @@
+{
+  "prompt-log": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "node ../scripts/log-prompt.mjs antigravity",
+        "timeout": 10
+      }
+    ]
+  }
+}
