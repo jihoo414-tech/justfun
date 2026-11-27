@@ -24,6 +24,7 @@ erDiagram
   users ||..o{ agent_runs : "user_id"
   conversations |o..o{ agent_runs : "conversation_id"
   messages |o..o{ agent_runs : "last_message_id"
+  users ||..o{ approval_cards : "user_id"
   agent_runs ||..o{ approval_cards : "agent_run_id"
   approval_cards |o..o{ messages : "approval_card_id"
   agent_runs |o..o{ messages : "agent_run_id"
